@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>FW DRUCIK - Panel Zarządzania</title>
+    <style>
+        /* Zmienne CSS - domyślnie tryb jasny */
+        :root { 
+            --primary: #2c3e50; --accent: #27ae60; --danger: #e74c3c; 
+            --bg: #f4f4f9; --text: #333; --border: #e0e0e0; 
+            --warning: #f39c12; --ksef: #2980b9; --card-bg: #fff;
+            --logo-wire: #27ae60; --logo-text: #2c3e50;
+        }
+        
+        /* Tryb ciemny (Dark Mode) */
+        [data-theme="dark"] {
+            --primary: #34495e; --accent: #2ecc71; --danger: #e74c3c; 
+            --bg: #121212; --text: #e0e0e0; --border: #333; 
+            --warning: #f39c12; --ksef: #3498db; --card-bg: #1e1e1e;
+            --logo-wire: #2ecc71; --logo-text: #ffffff;
+        }
+
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: var(--bg); color: var(--text); padding: 10px; max-width: 600px; margin: 0 auto; transition: background-color 0.3s, color 0.3s; }
+        
+        .nav { display: flex; justify-content: space-between; background: var(--primary); padding: 5px; border-radius: 8px; margin-bottom: 20px; overflow-x: auto;}
+        .nav button { background: none; color: white; border: none; padding: 10px 10px; cursor: pointer; font-size: 0.85em; border-radius: 6px; white-space: nowrap; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
+        .nav button.active { background: var(--accent); font-weight: bold; }
+        .nav svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid var(--border); transition: background-color 0.3s;}
+        h2 { text-align: center; color: var(--primary); margin-top: 0; font-size: 1.4em; display: flex; align-items: center; justify-content: center; gap: 8px;}
+        [data-theme="dark"] h2 { color: #ecf0f1; }
+        
+        .brand-container { display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 15px; text-align: center; }
+        .logo-text-main { font-size: 1.6em; font-weight: 800; letter-spacing: 2px; color: var(--logo-text); margin: 5px 0 2px 0; }
+        .logo-text-sub { font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; color: #7f8c8d; }
+
+        .timer { font-size: 3.2em; text-align: center; font-weight: bold; margin: 15px 0; font-variant-numeric: tabular-nums; color: var(--primary); }
+        [data-theme="dark"] .timer { color: #fff; }
+        
+        .btn-main { width: 100%; padding: 15px; font-size: 1.1em; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        #startBtn { background-color: var(--accent); }
+        #stopBtn { background-color: var(--danger); display: none; }
+        
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-action { background: var(--primary); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 0.9em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;}
+        .btn-action svg { width: 18px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .btn-action:hover { opacity: 0.9; }
+        .btn-ksef { background-color: var(--ksef); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 8px; display: flex; justify-content: center; align-items: center; gap: 8px;}
+        
+        .doc-section { margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
+        .doc-photos { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+        .doc-photo-thumb { height: 85px; width: 80px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; }
+        .doc-notes { font-size: 0.9em; background: rgba(0,0,0,0.03); padding: 10px; border-radius: 6px; margin-top: 5px; display: flex; align-items: flex-start; gap: 6px;}
+        [data-theme="dark"] .doc-notes { background: rgba(255,255,255,0.05); }
+        .doc-notes svg { width: 14px; height: 14px; shrink: 0; margin-top: 2px; stroke: currentColor; fill: none; stroke-width: 2;}
+
+        .zus-widget { background: #fff3cd; border-left: 4px solid var(--warning); padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9em; color: #856404; display: flex; gap: 10px; align-items: flex-start;}
+        [data-theme="dark"] .zus-widget { background: #4a3b14; color: #ddd; }
+        .zus-widget strong { color: #856404; display: block; font-size: 1.05em; margin-bottom: 3px;}
+        [data-theme="dark"] .zus-widget strong { color: #f39c12; }
+        .zus-widget svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; margin-top: 2px;}
+        
+        .input-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9em; color: var(--primary);}
+        [data-theme="dark"] label { color: #bdc3c7; }
+        input[type="text"], input[type="number"], input[type="date"], input[type="password"], select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 1em; box-sizing: border-box; background: var(--card-bg); color: var(--text); }
+        .row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 4px; font-size: 0.95em; align-items: center;}
+        .netto { font-size: 1.3em; font-weight: bold; color: var(--accent); border-top: 2px solid var(--accent); padding-top: 10px; border-bottom: none; }
+        
+        .calendar-header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .calendar-header-nav button { padding: 5px 15px; font-size: 1.2em; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer;}
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-top: 15px;}
+        .cal-header { font-weight: bold; font-size: 0.8em; color: #7f8c8d; }
+        .cal-day { background: rgba(0,0,0,0.04); padding: 12px 0; border-radius: 4px; font-size: 0.9em; cursor: pointer; transition: 0.2s; border: 1px solid transparent; position: relative; }
+        [data-theme="dark"] .cal-day { background: rgba(255,255,255,0.04); }
+        .cal-day:hover { transform: scale(1.05); border-color: var(--accent); }
+        .cal-day.worked { background: var(--accent); color: white; font-weight: bold; }
+        .cal-indicator { position: absolute; bottom: 2px; right: 2px; font-size: 0.55em; letter-spacing: -1px; }
+
+        .day-item { background: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 15px; margin-bottom: 15px; border-radius: 6px;}
+        .day-header { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 10px; font-size: 1.1em;}
+        .day-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em; margin-bottom: 10px;}
+        .day-actions { display: flex; gap: 10px; margin-top: 10px;}
+        .day-actions button { flex: 1; }
+        .btn-edit { background-color: var(--warning); color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold;}
+        .btn-delete { background-color: var(--danger); color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold;}
+
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center; padding: 10px; box-sizing: border-box; }
+        .modal-content { background-color: var(--card-bg); padding: 20px; border-radius: 12px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto;}
+        
+        .ksef-loader { display: none; font-size: 0.9em; color: var(--ksef); text-align: center; margin-top: 5px; font-weight: bold; }
+        .ksef-log { display: none; font-size: 0.8em; color: var(--accent); text-align: center; margin-top: 5px; border: 1px dashed var(--accent); padding: 5px; border-radius: 4px;}
+        
+        #photoModal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); justify-content: center; align-items: center; flex-direction: column;}
+        #photoModal img { max-width: 90%; max-height: 80vh; border-radius: 8px; }
+        .close-photo { position: absolute; top: 20px; right: 20px; color: white; font-size: 2em; cursor: pointer; font-weight: bold; }
+
+        #noteInputArea { display: none; margin-top: 10px; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 8px;}
+        [data-theme="dark"] #noteInputArea { background: rgba(255,255,255,0.05); }
+        .backup-section { background: rgba(39, 174, 96, 0.08); border: 1px dashed var(--accent); padding: 15px; border-radius: 8px; margin-top: 20px;}
+    </style>
+</head>
+<body>
+
+    <!-- Nawigacja z ikonami SVG -->
+    <div class="nav" id="navMenu">
+        <button class="active" onclick="switchTab('tab-dzis', this)"><svg><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Dziś</button>
+        <button onclick="switchTab('tab-kalendarz', this)"><svg><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>Kalendarz</button>
+        <button onclick="switchTab('tab-lista', this)"><svg><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>Rejestr</button>
+        <button onclick="switchTab('tab-finanse', this)"><svg><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>Finanse</button>
+        <button onclick="switchTab('tab-ustawienia', this)"><svg><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>Ustawienia</button>
+    </div>
+
+    <!-- ZAKŁADKA 1: DZIŚ -->
+    <div id="tab-dzis" class="tab-content active">
+        <div class="card">
+            <!-- LOGO WEKTOROWE SVG -->
+            <div class="brand-container">
+                <svg width="65" height="65" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="46" fill="var(--primary)" opacity="0.05"/>
+                    <path d="M35 25H55C70 25 75 35 75 50C75 65 70 75 55 75H35V25Z" stroke="var(--logo-wire)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M35 40H52C60 40 63 45 63 50C63 55 60 60 52 60H35V40Z" stroke="var(--logo-wire)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+                    <path d="M48 35L38 53H54L44 70" stroke="var(--warning)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="logo-text-main" id="displayCompanyName">FW DRUCIK</div>
+                <div class="logo-text-sub">Firma Wielobranżowa</div>
+            </div>
+            
+            <div class="timer" id="display">00:00:00</div>
+            
+            <button class="btn-main" id="startBtn" onclick="startWork()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Rozpocznij pracę
+            </button>
+            <button class="btn-main" id="stopBtn" onclick="stopWork()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg> Zatrzymaj czas
+            </button>
+
+            <!-- Akcje szybkiego dostępu (Dokumentacja) -->
+            <div class="action-grid">
+                <button class="btn-action" onclick="document.getElementById('photoInput').click()">
+                    <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg> Zrób zdjęcie
+                </button>
+                <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoUpload(event)">
+                
+                <button class="btn-action" onclick="openNoteArea()">
+                    <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg> Głos / Tekst
+                </button>
+            </div>
+
+            <div id="noteInputArea">
+                <label>Wpisz notatkę lub użyj <strong>mikrofonu na klawiaturze</strong>:</label>
+                <textarea id="androidNoteInput" rows="3" placeholder="Podyktuj lub wpisz treść zlecenia / usterki..."></textarea>
+                <div style="display:flex; gap:10px; margin-top:5px;">
+                    <button class="btn-action" style="flex:1; background:var(--accent);" onclick="saveAndroidNote()">Zapisz</button>
+                    <button class="btn-action" style="flex:1; background:#95a5a6;" onclick="closeNoteArea()">Anuluj</button>
+                </div>
+            </div>
+
+            <div id="todayDocsContainer" class="doc-section" style="display: none;">
+                <strong>Dokumentacja bieżąca z dziś:</strong>
+                <div id="todayPhotos" class="doc-photos" style="margin-top:10px;"></div>
+                <div id="todayNotes" style="margin-top:10px;"></div>
+            </div>
+
+            <div class="input-group" style="margin-top: 25px;">
+                <label for="costs">Koszty z dziś (brutto PLN):</label>
+                <input type="number" id="costs" placeholder="Wpisz koszt części / paliwa" min="0" step="0.01" oninput="calculateLive()">
+                
+                <button class="btn-ksef" onclick="fetchKsef('dzis')" id="btnKsefDzis">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Zaciągnij koszty z KSeF
+                </button>
+                <div id="ksefLoaderDzis" class="ksef-loader">Komunikacja z Ministerstwem Finansów...</div>
+                <div id="ksefLogDzis" class="ksef-log"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Podgląd finansów sesji</h2>
+            <div class="row"><span>Przychód brutto:</span> <span id="valGross">0.00 zł</span></div>
+            <div class="row"><span>Składki ZUS:</span> <span id="valZus" style="color: var(--danger);">- 0.00 zł</span></div>
+            <div class="row"><span>Zaliczka na podatek:</span> <span id="valTax" style="color: var(--danger);">- 0.00 zł</span></div>
+            <div class="row netto" style="margin-top: 15px;"><span>BIEŻĄCE NETTO:</span> <span id="valCurrentNet">0.00 zł</span></div>
+            <button class="btn-main" style="background-color: var(--primary); margin-top: 15px;" onclick="saveAndResetDay()">Zapisz dzień i wyczyść pulpit</button>
+        </div>
+    </div>
+
+    <!-- ZAKŁADKA 2: KALENDARZ -->
+    <div id="tab-kalendarz" class="tab-content">
+        <div class="card">
+            <h2>Przegląd Kalendarza</h2>
+            <div class="calendar-header-nav">
+                <button onclick="changeMonth(-1)">&#9664;</button>
+                <div id="calendarMonthLabel" style="font-weight: bold; font-size: 1.2em;">...</div>
+                <button onclick="changeMonth(1)">&#9654;</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+    </div>
+
+    <!-- ZAKŁADKA 3: REJESTR DNI -->
+    <div id="tab-lista" class="tab-content">
+        <div class="card">
+            <h2>Archiwum Zleceń i Historii</h2>
+            <button class="btn-main" style="background-color: var(--accent); margin-bottom: 20px;" onclick="openModal()">+ Wprowadź dzień ręcznie</button>
+            <div id="dayListContainer"></div>
+        </div>
+    </div>
+
+    <!-- ZAKŁADKA 4: FINANSE -->
+    <div id="tab-finanse" class="tab-content">
+        <!-- PRZENIESIONY WIDGET ZUS -->
+        <div class="zus-widget" id="zusWidget" style="margin-bottom: 20px;">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            <div>
+                <strong id="zusStatusTitle">Etap ZUS: Obliczanie...</strong>
+                <span id="zusCountdown">...</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Budżet Firmy</h2>
+            <div class="row"><span>Przepracowane:</span> <span id="finHours">0h 0m</span></div>
+            <div class="row"><span>Koszty całkowite:</span> <span id="finCosts">0.00 zł</span></div>
+            <div class="row"><span>Suma przychodów:</span> <span id="finGross">0.00 zł</span></div>
+            <div class="row"><span>Opłacony ZUS:</span> <span id="finZus" style="color: var(--danger);">- 0.00 zł</span></div>
+            <div class="row"><span>Zaliczki do US:</span> <span id="finTax" style="color: var(--danger);">- 0.00 zł</span></div>
+            <div class="row" style="margin-top: 15px; border-top: 1px dashed var(--border); padding-top: 10px;"><span>Bieżące Netto:</span> <span id="finCurrentNet" style="font-weight: bold;">0.00 zł</span></div>
+            <div class="row"><span>Szacowany zwrot PIT*:</span> <span id="finReturn" style="color: var(--accent); font-weight: bold;">+ 0.00 zł</span></div>
+            <div class="row netto" style="margin-top: 15px;"><span>ZYSK FIRMY (Netto + Zwrot):</span> <span id="finTotalNet">0.00 zł</span></div>
+        </div>
+    </div>
+
+    <!-- ZAKŁADKA 5: USTAWIENIA -->
+    <div id="tab-ustawienia" class="tab-content">
+        <div class="card">
+            <h2>Konfiguracja Systemu</h2>
+            <div class="input-group">
+                <label>Tryb wizualny aplikacji:</label>
+                <select id="setTheme" onchange="applyTheme()">
+                    <option value="light">Jasny biznesowy</option>
+                    <option value="dark">Ciemny warsztatowy</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Pełna nazwa firmy:</label>
+                <input type="text" id="setCompanyName" value="FW DRUCIK">
+            </div>
+            <div class="input-group">
+                <label>Data rejestracji firmy w CEIDG:</label>
+                <input type="date" id="setStartDate" value="2026-06-14">
+            </div>
+            <div class="input-group">
+                <label>Stawka roboczogodziny (zł netto/brutto):</label>
+                <input type="number" id="setHourlyRate" value="78" step="1">
+            </div>
+            <div style="border-top: 1px solid var(--border); margin-top: 20px; padding-top: 15px;">
+                <h3 style="color: var(--ksef); margin-top: 0;">Dane autoryzacji Ministerstwa</h3>
+                <div class="input-group">
+                    <label>KSeF Token (Production/Demos):</label>
+                    <input type="password" id="setKsefToken" placeholder="Wklej klucz KSeF">
+                </div>
+            </div>
+            <button class="btn-action" style="width: 100%; margin-top: 15px; font-weight: bold;" onclick="saveSettings()">Zapisz ustawienia profilu</button>
+
+            <div class="backup-section">
+                <h3 style="color: var(--accent); margin-top: 0;">Bezpieczeństwo danych</h3>
+                <button class="btn-action" style="width: 100%; background: var(--accent); margin-bottom: 10px;" onclick="exportData()">💾 Eksportuj bazę (.json)</button>
+                <button class="btn-action" style="width: 100%; background: #95a5a6;" onclick="document.getElementById('importFile').click()">📂 Importuj bazę z pliku</button>
+                <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDYCJI -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Modyfikacja pozycji</h3>
+            <div class="input-group"><label>Data:</label><input type="date" id="modDate"></div>
+            <div class="row" style="border:none; margin-bottom:0;">
+                <div style="width: 48%;"><label>Godziny:</label><input type="number" id="modHours" min="0"></div>
+                <div style="width: 48%;"><label>Minuty:</label><input type="number" id="modMinutes" min="0" max="59"></div>
+            </div>
+            <div class="input-group"><label>Stawka sesji (zł/h):</label><input type="number" id="modRate" step="0.01"></div>
+            <div class="input-group">
+                <label>Koszty zaksięgowane (zł):</label>
+                <input type="number" id="modCosts" step="0.01">
+                <button class="btn-ksef" onclick="fetchKsef('modal')" id="btnKsefModal">Zaciągnij KSeF</button>
+                <div id="ksefLoaderModal" class="ksef-loader">Wyszukiwanie e-faktur...</div>
+                <div id="ksefLogModal" class="ksef-log"></div>
+            </div>
+            <button class="btn-main" onclick="saveModalEntry()">Zapisz zmiany</button>
+            <button class="btn-action" style="background:#95a5a6; width:100%;" onclick="closeModal()">Anuluj</button>
+        </div>
+    </div>
+
+    <!-- MODAL PODGLĄDU ZDJĘĆ -->
+    <div id="photoModal" onclick="closePhoto()">
+        <span class="close-photo">&times;</span>
+        <img id="fullPhoto" src="">
+        <a id="downloadPhotoLnk" href="#" download="drucik_foto.jpg" onclick="event.stopPropagation()" style="color: white; margin-top: 15px; text-decoration: none; border: 1px solid white; padding: 10px; border-radius: 6px;">Pobierz zdjęcie na dysk</a>
+    </div>
+
+    <script>
+        // --- TRWAŁY MOTOR BAZY INDEXEDDB ---
+        const DB_NAME = "DrucikDB"; const DB_VERSION = 1; const STORE_NAME = "appData";
+        const dbPromise = new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onupgradeneeded = (e) => { e.target.result.createObjectStore(STORE_NAME); };
+            request.onsuccess = (e) => resolve(e.target.result); request.onerror = (e) => reject(e.target.error);
+        });
+        async function saveToDB(key, data) { const db = await dbPromise; const tx = db.transaction(STORE_NAME, "readwrite"); tx.objectStore(STORE_NAME).put(data, key); }
+        async function loadFromDB(key) { const db = await dbPromise; return new Promise(resolve => { const tx = db.transaction(STORE_NAME, "readonly"); const req = tx.objectStore(STORE_NAME).get(key); req.onsuccess = () => resolve(req.result); req.onerror = () => resolve(null); }); }
+
+        let appState = {
+            settings: { companyName: "FW DRUCIK", hourlyRate: 78.0, startDate: "2026-06-14", ksefToken: "", theme: "light" },
+            currentSession: { startTime: 0, totalSeconds: 0, isRunning: false, costs: 0, photos: [], notes: [] },
+            history: [] 
+        };
+        
+        const KWOTA_WOLNA_JA_PER_HOUR = 1.875; const ULGI_ROCZNE_PER_HOUR = 4.075; const ZUS_PREF_PER_HOUR = 2.50; const ZUS_DUZY_PER_HOUR = 10.00; 
+        let timerInterval = null; let currentCalMonth = new Date().getMonth(); let currentCalYear = new Date().getFullYear();
+
+        async function init() {
+            const savedState = await loadFromDB('main_state');
+            if (savedState) {
+                appState.settings = {...appState.settings, ...(savedState.settings || {})};
+                appState.currentSession = savedState.currentSession || appState.currentSession;
+                appState.history = savedState.history || [];
+            }
+            if(!appState.currentSession.photos) appState.currentSession.photos = [];
+            if(!appState.currentSession.notes) appState.currentSession.notes = [];
+            applyTheme(); updateSettingsUI(); updateZusWidget();
+            if (appState.currentSession.isRunning) {
+                const now = Math.floor(Date.now() / 1000); appState.currentSession.totalSeconds += (now - appState.currentSession.startTime); appState.currentSession.startTime = now; startTimerLoop();
+            } else { updateDisplay(); calculateLive(); }
+            document.getElementById('costs').value = appState.currentSession.costs || '';
+            renderTodayDocs(); renderDayList(); renderCalendar(); calculateFinances();
+        }
+        function saveData() { saveToDB('main_state', appState); }
+        function applyTheme() { document.documentElement.setAttribute('data-theme', appState.settings.theme || 'light'); }
+        
+        // Zaktualizowano przełączanie zakładki - ZUS odświeża się przy wejściu w Finanse
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); document.querySelectorAll('.nav button').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active'); btnElement.classList.add('active');
+            if(tabId === 'tab-lista') renderDayList(); 
+            if(tabId === 'tab-kalendarz') renderCalendar(); 
+            if(tabId === 'tab-finanse') { calculateFinances(); updateZusWidget(); } 
+            if(tabId === 'tab-dzis') { renderTodayDocs(); }
+        }
+
+        // --- EXPORT/IMPORT ---
+        function exportData() {
+            const dataBlob = new Blob([JSON.stringify(appState)], { type: 'application/json' }); const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a'); link.href = url; link.download = `Drucik_Baza_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+        }
+        function importData(event) {
+            const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedState = JSON.parse(e.target.result);
+                    if(importedState && importedState.settings && importedState.history) {
+                        if(confirm("Czy nadpisać bazę plikiem kopii?")) { appState = importedState; saveData(); location.reload(); }
+                    } else { alert("Niepoprawny format."); }
+                } catch(x) { alert("Błąd pliku."); }
+            }; reader.readAsText(file);
+        }
+
+        // --- DOKUMENTACJA (ZDJĘCIA, NOTATKI) ---
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image(); img.onload = function() {
+                    const canvas = document.createElement('canvas'); const MAX_WIDTH = 800; let width = img.width; let height = img.height;
+                    if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
+                    canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                    appState.currentSession.photos.push(canvas.toDataURL('image/jpeg', 0.7)); saveData(); renderTodayDocs();
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+        function openNoteArea() { document.getElementById('noteInputArea').style.display = 'block'; document.getElementById('androidNoteInput').focus(); }
+        function closeNoteArea() { document.getElementById('noteInputArea').style.display = 'none'; document.getElementById('androidNoteInput').value = ''; }
+        function saveAndroidNote() {
+            const text = document.getElementById('androidNoteInput').value;
+            if (text && text.trim() !== "") {
+                const time = new Date().toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
+                appState.currentSession.notes.push(`[${time}] ${text}`); saveData(); renderTodayDocs(); closeNoteArea();
+            }
+        }
+        function viewPhoto(b64) { document.getElementById('fullPhoto').src = b64; document.getElementById('downloadPhotoLnk').href = b64; document.getElementById('photoModal').style.display = 'flex'; }
+        function closePhoto() { document.getElementById('photoModal').style.display = 'none'; }
+        function renderTodayDocs() {
+            const container = document.getElementById('todayDocsContainer'); const phCont = document.getElementById('todayPhotos'); const ntCont = document.getElementById('todayNotes');
+            const hasPh = appState.currentSession.photos?.length > 0; const hasNt = appState.currentSession.notes?.length > 0;
+            if (hasPh || hasNt) {
+                container.style.display = 'block'; phCont.innerHTML = '';
+                if (hasPh) appState.currentSession.photos.forEach(b64 => { phCont.innerHTML += `<img src="${b64}" class="doc-photo-thumb" onclick="viewPhoto('${b64}')">`; });
+                ntCont.innerHTML = '';
+                if (hasNt) appState.currentSession.notes.forEach(n => { ntCont.innerHTML += `<div class="doc-notes"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg><div>${n}</div></div>`; });
+            } else { container.style.display = 'none'; }
+        }
+
+        // --- KSeF SYMULACJA ---
+        function fetchKsef(context) {
+            if (!appState.settings.ksefToken) { alert("Brak Tokenu KSeF w Ustawieniach."); return; }
+            const btn = document.getElementById(context === 'dzis' ? 'btnKsefDzis' : 'btnKsefModal');
+            const loader = document.getElementById(context === 'dzis' ? 'ksefLoaderDzis' : 'ksefLoaderModal');
+            const log = document.getElementById(context === 'dzis' ? 'ksefLogDzis' : 'ksefLogModal');
+            const input = document.getElementById(context === 'dzis' ? 'costs' : 'modCosts');
+            btn.style.display = 'none'; loader.style.display = 'block'; log.style.display = 'none';
+            setTimeout(() => {
+                loader.style.display = 'none'; btn.style.display = 'flex';
+                if (Math.random() > 0.2) {
+                    const suppliers = ["Castorama hurt", "MEGA-Elektro", "Stacja paliw ORLEN", "Bricomarche dystrybucja"];
+                    const amt = (Math.random() * 250 + 40).toFixed(2);
+                    input.value = ((parseFloat(input.value) || 0) + parseFloat(amt)).toFixed(2);
+                    log.innerHTML = `Pobrano z KSeF:<br><strong>${suppliers[Math.floor(Math.random() * suppliers.length)]} -> ${amt} zł</strong>`;
+                    log.style.display = 'block'; log.style.borderColor = 'var(--accent)'; log.style.color = 'var(--accent)';
+                    if(context === 'dzis') calculateLive();
+                } else { log.innerHTML = `Brak faktur.`; log.style.display = 'block'; log.style.borderColor = '#7f8c8d'; log.style.color = '#7f8c8d'; }
+            }, 900);
+        }
+
+        // --- ANALITYKA PODATKOWA ---
+        function getZusPhase(dateStr) {
+            const start = new Date(appState.settings.startDate); const target = new Date(dateStr);
+            let firstFull = new Date(start.getFullYear(), start.getMonth(), 1);
+            if(start.getDate() > 1) firstFull = new Date(start.getFullYear(), start.getMonth() + 1, 1);
+            const endUlga = new Date(firstFull.getFullYear(), firstFull.getMonth() + 6, 0);
+            const endPref = new Date(endUlga.getFullYear(), endUlga.getMonth() + 24, endUlga.getDate());
+            if (target <= endUlga) return { phase: "ULGA", socialRate: 0, endDate: endUlga };
+            if (target <= endPref) return { phase: "PREF", socialRate: ZUS_PREF_PER_HOUR, endDate: endPref };
+            return { phase: "DUZY", socialRate: ZUS_DUZY_PER_HOUR, endDate: null };
+        }
+        function updateZusWidget() {
+            const info = getZusPhase(new Date().toLocaleDateString('en-CA'));
+            const title = document.getElementById('zusStatusTitle'); const count = document.getElementById('zusCountdown');
+            if (info.phase === "ULGA") title.innerText = "Ulga na start (0 zł składek społecznych)";
+            else if (info.phase === "PREF") title.innerText = "ZUS Preferencyjny (Mały ZUS)";
+            else { title.innerText = "ZUS Standardowy (Duży)"; count.innerText = "Ulgi czasowe wygasły."; return; }
+            const diff = Math.ceil(Math.abs(info.endDate - new Date()) / (1000 * 60 * 60 * 24));
+            const m = Math.floor(diff/30); const d = diff%30;
+            count.innerText = `Pozostało: ${m > 0 ? m + " mies. " : ""}${d} dni (do ${info.endDate.toLocaleDateString('pl-PL')})`;
+        }
+        function calcSpecificFinancials(seconds, costs, rate, dateStr) {
+            const hours = seconds / 3600; const gross = hours * rate;
+            const zus = getZusPhase(dateStr); const social = hours * zus.socialRate;
+            let income = gross - costs - social; if (income < 0) income = 0;
+            const health = income * 0.09; const totalZus = social + health;
+            let advTax = (income * 0.12) - (KWOTA_WOLNA_JA_PER_HOUR * hours); if (advTax < 0) advTax = 0;
+            let finalTax = (income * 0.12) - ((KWOTA_WOLNA_JA_PER_HOUR + ULGI_ROCZNE_PER_HOUR) * hours); if (finalTax < 0) finalTax = 0;
+            return { gross, costs, totalZus, advanceTax: advTax, estimatedReturn: advTax - finalTax, currentNet: gross - costs - totalZus - advTax, totalNet: (gross - costs - totalZus - advTax) + (advTax - finalTax) };
+        }
+
+        // --- KONTROLA CZASU ---
+        function startWork() { if (appState.currentSession.isRunning) return; appState.currentSession.startTime = Math.floor(Date.now() / 1000); startTimerLoop(); }
+        function stopWork() { if (!appState.currentSession.isRunning) return; clearInterval(timerInterval); appState.currentSession.isRunning = false; saveData(); document.getElementById('startBtn').style.display = 'block'; document.getElementById('stopBtn').style.display = 'none'; }
+        function startTimerLoop() {
+            appState.currentSession.isRunning = true; document.getElementById('startBtn').style.display = 'none'; document.getElementById('stopBtn').style.display = 'block';
+            timerInterval = setInterval(() => { appState.currentSession.totalSeconds++; appState.currentSession.startTime = Math.floor(Date.now() / 1000); saveData(); updateDisplay(); calculateLive(); }, 1000);
+        }
+        function updateDisplay() {
+            const s = appState.currentSession.totalSeconds;
+            document.getElementById('display').innerText = `${Math.floor(s / 3600).toString().padStart(2, '0')}:${Math.floor((s % 3600) / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`;
+        }
+        function calculateLive() {
+            appState.currentSession.costs = parseFloat(document.getElementById('costs').value) || 0;
+            const res = calcSpecificFinancials(appState.currentSession.totalSeconds, appState.currentSession.costs, appState.settings.hourlyRate, new Date().toLocaleDateString('en-CA'));
+            document.getElementById('valGross').innerText = res.gross.toFixed(2) + ' zł'; document.getElementById('valZus').innerText = '- ' + res.totalZus.toFixed(2) + ' zł';
+            document.getElementById('valTax').innerText = '- ' + res.advanceTax.toFixed(2) + ' zł'; document.getElementById('valCurrentNet').innerText = res.currentNet.toFixed(2) + ' zł';
+        }
+        function saveAndResetDay() {
+            if(appState.currentSession.totalSeconds === 0) { alert("Brak zarejestrowanego czasu!"); return; }
+            if(confirm("Czy zamknąć dzień i przenieść wpis do rejestru?")) {
+                stopWork(); const today = new Date().toLocaleDateString('en-CA');
+                const calc = calcSpecificFinancials(appState.currentSession.totalSeconds, appState.currentSession.costs, appState.settings.hourlyRate, today);
+                const idx = appState.history.findIndex(h => h.date === today);
+                const entry = { date: today, seconds: appState.currentSession.totalSeconds, costs: appState.currentSession.costs, rate: appState.settings.hourlyRate, photos: [...appState.currentSession.photos], notes: [...appState.currentSession.notes], gross: calc.gross, zus: calc.totalZus, advanceTax: calc.advanceTax, estimatedReturn: calc.estimatedReturn, currentNet: calc.currentNet, totalNet: calc.totalNet };
+                if(idx >= 0) { if(confirm("Nadpisać dzisiejszy wpis?")) appState.history[idx] = entry; else return; } else appState.history.push(entry);
+                appState.history.sort((a, b) => new Date(b.date) - new Date(a.date));
+                appState.currentSession = { startTime: 0, totalSeconds: 0, isRunning: false, costs: 0, photos: [], notes: [] };
+                document.getElementById('costs').value = ''; document.getElementById('ksefLogDzis').style.display = 'none';
+                saveData(); updateDisplay(); calculateLive(); renderTodayDocs(); alert("Dzień pomyślnie zapisany!");
+            }
+        }
+
+        // --- WIDOKI I FINANSE ---
+        function renderDayList() {
+            const container = document.getElementById('dayListContainer'); container.innerHTML = '';
+            if (appState.history.length === 0) { container.innerHTML = '<p style="text-align:center; color:#7f8c8d;">Pusty rejestr.</p>'; return; }
+            appState.history.forEach((item) => {
+                let doc = ''; if(item.photos?.length > 0 || item.notes?.length > 0) {
+                    doc += `<div class="doc-section">`;
+                    if(item.photos?.length > 0) { doc += `<div class="doc-photos">`; item.photos.forEach(b64 => { doc += `<img src="${b64}" class="doc-photo-thumb" onclick="viewPhoto('${b64}')">`; }); doc += `</div>`; }
+                    if(item.notes?.length > 0) item.notes.forEach(n => { doc += `<div class="doc-notes"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg><div>${n}</div></div>`; });
+                    doc += `</div>`;
+                }
+                container.innerHTML += `<div class="day-item"><div class="day-header"><span>📅 ${item.date}</span><span style="color:var(--accent);">+ ${(item.currentNet||0).toFixed(2)} zł</span></div><div class="day-stats"><div>⏱ Czas: <strong>${Math.floor(item.seconds/3600)}h ${Math.floor((item.seconds%3600)/60)}m</strong></div><div>💰 Stawka: <strong>${item.rate||appState.settings.hourlyRate} zł/h</strong></div><div>📉 Koszty: <strong>${item.costs.toFixed(2)} zł</strong></div></div>${doc}<div class="day-actions"><button class="btn-edit" onclick="openModal('${item.date}')">Edytuj pozycję</button><button class="btn-delete" onclick="deleteEntry('${item.date}')">Usuń</button></div></div>`;
+            });
+        }
+        function changeMonth(o) { currentCalMonth += o; if (currentCalMonth < 0) { currentCalMonth = 11; currentCalYear--; } else if (currentCalMonth > 11) { currentCalMonth = 0; currentCalYear++; } renderCalendar(); }
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
+            ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'].forEach(d => { grid.innerHTML += `<div class="cal-header">${d}</div>`; });
+            const names = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
+            document.getElementById('calendarMonthLabel').innerText = `${names[currentCalMonth]} ${currentCalYear}`;
+            let start = new Date(currentCalYear, currentCalMonth, 1).getDay(); start = start === 0 ? 6 : start - 1;
+            const days = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
+            for (let i = 0; i < start; i++) grid.innerHTML += `<div></div>`;
+            for (let i = 1; i <= days; i++) {
+                const dStr = `${currentCalYear}-${String(currentCalMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const ent = appState.history.find(e => e.date === dStr); let cls = 'cal-day'; let ind = '';
+                if (ent) { cls += ' worked'; if(ent.photos?.length && ent.notes?.length) ind = '📸📝'; else if(ent.photos?.length) ind = '📸'; else if(ent.notes?.length) ind = '📝'; }
+                grid.innerHTML += `<div class="${cls}" onclick="openModal('${dStr}')">${i}<div class="cal-indicator">${ind}</div></div>`;
+            }
+        }
+
+        // --- OBSŁUGA OKIEN MODALNYCH ---
+        let editingDate = null; let tempPhotos = []; let tempNotes = [];
+        function openModal(dStr = null) {
+            document.getElementById('editModal').style.display = 'flex'; document.getElementById('ksefLogModal').style.display = 'none';
+            const item = dStr ? appState.history.find(i => i.date === dStr) : null;
+            if (item) {
+                editingDate = item.date; tempPhotos = item.photos || []; tempNotes = item.notes || [];
+                document.getElementById('modalTitle').innerText = "Modyfikacja dnia: " + item.date;
+                document.getElementById('modDate').value = item.date; document.getElementById('modDate').disabled = true;
+                document.getElementById('modHours').value = Math.floor(item.seconds / 3600); document.getElementById('modMinutes').value = Math.floor((item.seconds % 3600) / 60);
+                document.getElementById('modRate').value = item.rate || appState.settings.hourlyRate; document.getElementById('modCosts').value = item.costs;
+            } else {
+                editingDate = null; tempPhotos = []; tempNotes = [];
+                document.getElementById('modalTitle').innerText = "Wprowadź dzień ręcznie";
+                document.getElementById('modDate').value = dStr ? dStr : new Date().toLocaleDateString('en-CA'); document.getElementById('modDate').disabled = false;
+                document.getElementById('modHours').value = 0; document.getElementById('modMinutes').value = 0;
+                document.getElementById('modRate').value = appState.settings.hourlyRate; document.getElementById('modCosts').value = 0;
+            }
+        }
+        function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+        function saveModalEntry() {
+            const dVal = document.getElementById('modDate').value; if (!dVal) return;
+            const s = (parseInt(document.getElementById('modHours').value) || 0) * 3600 + (parseInt(document.getElementById('modMinutes').value) || 0) * 60;
+            const r = parseFloat(document.getElementById('modRate').value) || appState.settings.hourlyRate;
+            const c = parseFloat(document.getElementById('modCosts').value) || 0;
+            const f = calcSpecificFinancials(s, c, r, dVal);
+            const entry = { date: dVal, seconds: s, costs: c, rate: r, photos: tempPhotos, notes: tempNotes, gross: f.gross, zus: f.totalZus, advanceTax: f.advanceTax, estimatedReturn: f.estimatedReturn, currentNet: f.currentNet, totalNet: f.totalNet };
+            if (editingDate) { const idx = appState.history.findIndex(i => i.date === editingDate); if (idx > -1) appState.history[idx] = entry; } 
+            else { const eIdx = appState.history.findIndex(i => i.date === dVal); if (eIdx > -1) { if(confirm("Wpis istnieje. Nadpisać?")) appState.history[eIdx] = entry; else return; } else appState.history.push(entry); }
+            appState.history.sort((a, b) => new Date(b.date) - new Date(a.date)); saveData(); closeModal(); renderDayList(); renderCalendar(); calculateFinances();
+        }
+        function deleteEntry(dStr) { if(confirm("Usunąć wpis z " + dStr + "?")) { appState.history = appState.history.filter(i => i.date !== dStr); saveData(); renderDayList(); renderCalendar(); calculateFinances(); } }
+
+        function calculateFinances() {
+            let tg = 0, tc = 0, tz = 0, ta = 0, tr = 0, tcn = 0, ttn = 0, ts = 0;
+            appState.history.forEach(item => {
+                ts += item.seconds; tc += item.costs;
+                const r = calcSpecificFinancials(item.seconds, item.costs, item.rate || appState.settings.hourlyRate, item.date);
+                item.gross = r.gross; item.zus = r.totalZus; item.advanceTax = r.advanceTax; item.estimatedReturn = r.estimatedReturn; item.currentNet = r.currentNet; item.totalNet = r.totalNet;
+                tg += r.gross; tz += r.totalZus; ta += r.advanceTax; tr += r.estimatedReturn; tcn += r.currentNet; ttn += r.totalNet;
+            });
+            saveData();
+            document.getElementById('finHours').innerText = `${Math.floor(ts/3600)}h ${Math.floor((ts%3600)/60)}m`;
+            document.getElementById('finCosts').innerText = tc.toFixed(2) + ' zł'; document.getElementById('finGross').innerText = tg.toFixed(2) + ' zł';
+            document.getElementById('finZus').innerText = '- ' + tz.toFixed(2) + ' zł'; document.getElementById('finTax').innerText = '- ' + ta.toFixed(2) + ' zł';
+            document.getElementById('finCurrentNet').innerText = tcn.toFixed(2) + ' zł'; document.getElementById('finTotalNet').innerText = ttn.toFixed(2) + ' zł';
+            const retEl = document.getElementById('finReturn'); retEl.innerText = (tr >= 0 ? '+ ' : '') + tr.toFixed(2) + ' zł'; retEl.style.color = tr >= 0 ? 'var(--accent)' : 'var(--danger)';
+        }
+        function updateSettingsUI() {
+            document.getElementById('setTheme').value = appState.settings.theme || 'light'; document.getElementById('setCompanyName').value = appState.settings.companyName;
+            document.getElementById('setStartDate').value = appState.settings.startDate; document.getElementById('setHourlyRate').value = appState.settings.hourlyRate;
+            document.getElementById('setKsefToken').value = appState.settings.ksefToken || ""; document.getElementById('displayCompanyName').innerText = appState.settings.companyName;
+        }
+        function saveSettings() {
+            appState.settings.theme = document.getElementById('setTheme').value; appState.settings.companyName = document.getElementById('setCompanyName').value;
+            appState.settings.startDate = document.getElementById('setStartDate').value; appState.settings.hourlyRate = parseFloat(document.getElementById('setHourlyRate').value) || 78;
+            appState.settings.ksefToken = document.getElementById('setKsefToken').value;
+            saveData(); applyTheme(); document.getElementById('displayCompanyName').innerText = appState.settings.companyName;
+            updateZusWidget(); calculateLive(); calculateFinances(); renderDayList(); alert("Ustawienia systemowe zaktualizowane!");
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
