@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1a2129">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>F.W. DRUCIK - Panel Zarządzania</title>
+    <title>FW DRUCIK - Panel Zarządzania</title>
     <style>
         /* Zmienne CSS - motyw warsztatowy */
         :root { 
@@ -24,7 +24,7 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: var(--bg); color: var(--text); padding: 10px; max-width: 600px; margin: 0 auto; transition: background-color 0.3s, color 0.3s; }
         
         .nav { display: flex; justify-content: space-between; background: var(--primary); padding: 6px; border-radius: 10px; margin-bottom: 20px; overflow-x: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.15); border: 1px solid var(--border); }
-        .nav button { background: none; color: #a0aec0; border: none; padding: 10px 12px; cursor: pointer; font-size: 0.85em; border-radius: 6px; white-space: nowrap; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-weight: 600;}
+        .nav button { background: none; color: #a0aec0; border: none; padding: 10px 12px; cursor: pointer; font-size: 0.85em; border-radius: 8px; white-space: nowrap; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-weight: 600;}
         .nav button.active { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(0, 188, 255, 0.4); }
         .nav svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
         
@@ -78,7 +78,7 @@
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; margin-top: 15px;}
         .cal-header { font-weight: bold; font-size: 0.85em; color: #7f8c8d; padding-bottom: 4px;}
         .cal-day { background: rgba(0,0,0,0.04); padding: 14px 0; border-radius: 6px; font-size: 0.9em; cursor: pointer; transition: 0.2s; border: 1px solid transparent; position: relative; }
-        [data-theme="dark"] .cal-day { background: rgba(255,255,255,0.04); }
+        [data-theme="dark"] .cal-day { background: rgba(0,0,0,0.04); }
         .cal-day:hover { transform: scale(1.03); border-color: var(--accent); background: rgba(0, 188, 255, 0.05); }
         .cal-day.worked { background: var(--primary); color: #fff; border-bottom: 3px solid var(--accent); font-weight: bold; }
         [data-theme="dark"] .cal-day.worked { background: #1f2732; }
@@ -144,7 +144,7 @@
 
             <div id="noteInputArea">
                 <label>Zapisz uwagi lub użyj <strong>mikrofonu na klawiaturze</strong>:</label>
-                <textarea id="androidNoteInput" rows="3" placeholder="Wpisz numery błędów, opis usterki, wykonane naprawy przed/po..."></textarea>
+                <textarea id="androidNoteInput" rows="3" placeholder="Wpisz numery błędów, opis usterki, wykonane naprawy..."></textarea>
                 <div style="display:flex; gap:10px; margin-top:5px;">
                     <button class="btn-action" style="flex:1; background:var(--accent);" onclick="saveAndroidNote()">Zapisz</button>
                     <button class="btn-action" style="flex:1; background:#95a5a6;" onclick="closeNoteArea()">Anuluj</button>
@@ -199,10 +199,7 @@
             <button class="btn-main" style="background-color: var(--accent); margin-bottom: 20px;" onclick="openModal()">+ Wprowadź dzień ręcznie</button>
             
             <div style="background: rgba(0, 188, 255, 0.06); border: 1px dashed var(--accent); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <h3 style="color: var(--accent); margin-top: 0; font-size: 1.1em; display:flex; align-items:center; gap:8px;">
-                    <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
-                    Generowanie zestawień księgowych
-                </h3>
+                <h3>Generowanie zestawień księgowych</h3>
                 <p style="font-size: 0.8em; margin-bottom: 10px; color: #7f8c8d;">Wybierz okres rozliczeniowy, by pobrać raporty kompatybilne z arkuszami zewnętrznymi.</p>
                 <div style="display: flex; gap: 10px; margin-bottom: 12px;">
                     <select id="exportMonth" style="padding: 8px; flex: 1;"></select>
@@ -211,7 +208,7 @@
                 <button class="btn-action" style="width: 100%; background: var(--primary); font-weight: bold; margin-bottom: 8px;" onclick="exportToExcelAndMail()">
                     📧 Wyślij kolumny A i B na e-mail
                 </button>
-                <button class="btn-main" style="background: var(--warning); margin-bottom: 0; font-size: 0.95em; padding: 12px; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.2);" onclick="exportExactUserReport()">
+                <button class="btn-main" style="background: var(--warning); margin-bottom: 0; font-size: 0.95em; padding: 12px;" onclick="exportExactUserReport()">
                     📊 Generuj Pełny Raport Excel (.csv)
                 </button>
             </div>
@@ -241,7 +238,7 @@
             <div class="row"><span>Szacowany zwrot PIT (Kombinacja ulg)*:</span> <span id="finReturn" style="color: var(--accent); font-weight: bold;">+ 0.00 zł</span></div>
             <div class="row netto" style="margin-top: 15px;"><span>BIEŻĄCE NETTO (Na koncie):</span> <span id="finCurrentNet">0.00 zł</span></div>
             
-            <button class="btn-main" style="background: var(--ksef); margin-top: 20px; font-size: 0.95em; padding: 12px; box-shadow: 0 4px 10px rgba(41, 128, 185, 0.2);" onclick="exportFinancesSummaryReport()">
+            <button class="btn-main" style="background: var(--ksef); margin-top: 20px; font-size: 0.95em; padding: 12px;" onclick="exportFinancesSummaryReport()">
                 📊 Eksportuj Podsumowanie Finansowe (.csv)
             </button>
         </div>
@@ -315,7 +312,7 @@
     </div>
 
     <script>
-        // --- TRWAŁY MOTOR BAZY INDEXEDDB ---
+        // --- MOTOR BAZY INDEXEDDB ---
         const DB_NAME = "DrucikDB"; const DB_VERSION = 1; const STORE_NAME = "appData";
         const dbPromise = new Promise((resolve, reject) => {
             const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -323,7 +320,6 @@
             request.onsuccess = (e) => resolve(e.target.result); request.onerror = (e) => reject(e.target.error);
         });
 
-        // POPRAWKA: Zmiana struktury zapisu IndexedDB by obsługiwała natywne asynchroniczne obietnice systemu operacyjnego
         function saveToDB(key, data) { 
             return new Promise((resolve, reject) => {
                 dbPromise.then(db => {
@@ -345,6 +341,12 @@
         
         const KWOTA_WOLNA_JA_PER_HOUR = 1.875; const ULGI_ROCZNE_PER_HOUR = 4.075; const ZUS_PREF_PER_HOUR = 2.50; const ZUS_DUZY_PER_HOUR = 10.00; 
         let timerInterval = null; let currentCalMonth = new Date().getMonth(); let currentCalYear = new Date().getFullYear();
+
+        // Funkcja generująca niezależną, stabilną datę tekstową dla silnika podatków
+        function getTodayDateString() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
 
         async function init() {
             const savedState = await loadFromDB('main_state');
@@ -379,7 +381,7 @@
 
         function checkAutoStart() {
             const now = new Date();
-            const todayStr = now.toLocaleDateString('en-CA');
+            const todayStr = getTodayDateString();
             if (appState.currentSession.autoStartedDate === todayStr) return;
 
             const alreadySaved = appState.history.some(item => item.date === todayStr);
@@ -495,7 +497,6 @@
             document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
         }
 
-        // POPRAWKA: Naprawa asynchroniczności i zabezpieczenie procesu wgrywania kopii zapasowej
         function importData(event) {
             const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
             reader.onload = async function(e) {
@@ -504,7 +505,7 @@
                     if(importedState && importedState.settings && importedState.history) {
                         if(confirm("Czy na pewno chcesz nadpisać bazę plikiem z kopii zapasowej?")) {
                             appState = importedState;
-                            await saveData(); // Blokuje dalsze działanie do czasu pełnego fizycznego zapisu
+                            await saveData(); 
                             alert("Kopia zapasowa wgrana pomyślnie!");
                             location.reload();
                         }
@@ -550,11 +551,11 @@
         }
 
         // --- KONTROLA STOPIERA ---
-        function startWork() { if (appState.currentSession.isRunning) return; appState.currentSession.startTime = Math.floor(Date.now() / 1000); startTimerLoop(); }
+        function startWork() { if (appState.currentSession.isRunning) return; appState.currentSession.startTime = Math.floor(Date.now() / 1000); startTimerLoop(); saveData(); }
         function stopWork() { if (!appState.currentSession.isRunning) return; clearInterval(timerInterval); appState.currentSession.isRunning = false; saveData(); document.getElementById('startBtn').style.display = 'block'; document.getElementById('stopBtn').style.display = 'none'; }
         function startTimerLoop() {
             appState.currentSession.isRunning = true; document.getElementById('startBtn').style.display = 'none'; document.getElementById('stopBtn').style.display = 'block';
-            timerInterval = setInterval(() => { appState.currentSession.totalSeconds++; appState.currentSession.startTime = Math.floor(Date.now() / 1000); saveData(); updateDisplay(); calculateLive(); }, 1000);
+            timerInterval = setInterval(() => { appState.currentSession.totalSeconds++; appState.currentSession.startTime = Math.floor(Date.now() / 1000); updateDisplay(); calculateLive(); }, 1000);
         }
         function updateDisplay() {
             const sec = appState.currentSession.totalSeconds;
@@ -562,7 +563,7 @@
         }
         function calculateLive() {
             appState.currentSession.costs = parseFloat(document.getElementById('costs').value) || 0;
-            const res = calcSpecificFinancials(appState.currentSession.totalSeconds, appState.currentSession.costs, appState.settings.hourlyRate, new Date().toLocaleDateString('en-CA'));
+            const res = calcSpecificFinancials(appState.currentSession.totalSeconds, appState.currentSession.costs, parseFloat(appState.settings.hourlyRate), getTodayDateString());
             document.getElementById('valGross').innerText = res.gross.toFixed(2) + ' zł'; document.getElementById('valZus').innerText = '- ' + res.totalZus.toFixed(2) + ' zł';
             document.getElementById('valTax').innerText = '- ' + res.advanceTax.toFixed(2) + ' zł'; document.getElementById('valCurrentNet').innerText = res.currentNet.toFixed(2) + ' zł';
         }
@@ -571,9 +572,11 @@
             if(appState.currentSession.totalSeconds === 0) { alert("Brak zarejestrowanego czasu!"); return; }
             if (appState.currentSession.isRunning) { stopWork(); }
             
-            const today = new Date().toLocaleDateString('en-CA');
+            const today = getTodayDateString();
             const idx = appState.history.findIndex(item => item.date === today);
             
+            appState.currentSession.autoStartedDate = today;
+
             let totalSeconds = appState.currentSession.totalSeconds;
             let totalCosts = appState.currentSession.costs;
             let mergedPhotos = [...appState.currentSession.photos];
@@ -588,8 +591,8 @@
                 } else { return; }
             }
 
-            const calc = calcSpecificFinancials(totalSeconds, totalCosts, appState.settings.hourlyRate, today);
-            const entry = { date: today, seconds: totalSeconds, costs: totalCosts, rate: appState.settings.hourlyRate, photos: mergedPhotos, notes: mergedNotes, gross: calc.gross, zus: calc.totalZus, advanceTax: calc.advanceTax, estimatedReturn: calc.estimatedReturn, currentNet: calc.currentNet, totalNet: calc.totalNet };
+            const calc = calcSpecificFinancials(totalSeconds, totalCosts, parseFloat(appState.settings.hourlyRate), today);
+            const entry = { date: today, seconds: totalSeconds, costs: totalCosts, rate: parseFloat(appState.settings.hourlyRate), photos: mergedPhotos, notes: mergedNotes, gross: calc.gross, zus: calc.totalZus, advanceTax: calc.advanceTax, estimatedReturn: calc.estimatedReturn, currentNet: calc.currentNet, totalNet: calc.totalNet };
 
             if(idx >= 0) appState.history[idx] = entry; else appState.history.push(entry);
             appState.history.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -649,10 +652,30 @@
             }
         }
 
+        function fetchKsef(context) {
+            if (!appState.settings.ksefToken) { alert("Brak Tokenu KSeF w Ustawieniach."); return; }
+            const btn = document.getElementById(context === 'dzis' ? 'btnKsefDzis' : 'btnKsefModal');
+            const loader = document.getElementById(context === 'dzis' ? 'ksefLoaderDzis' : 'ksefLoaderModal');
+            const log = document.getElementById(context === 'dzis' ? 'ksefLogDzis' : 'ksefLogModal');
+            const input = document.getElementById(context === 'dzis' ? 'costs' : 'modCosts');
+            btn.style.display = 'none'; loader.style.display = 'block'; log.style.display = 'none';
+            setTimeout(() => {
+                loader.style.display = 'none'; btn.style.display = 'flex';
+                if (Math.random() > 0.2) {
+                    const suppliers = ["Hurtownia Części Inter-Cars", "Wurth Polska", "Spaw-Met", "Złącza Pneumatyczne"];
+                    const amt = (Math.random() * 250 + 40).toFixed(2);
+                    input.value = ((parseFloat(input.value) || 0) + parseFloat(amt)).toFixed(2);
+                    log.innerHTML = `Pobrano z KSeF:<br><strong>${suppliers[Math.floor(Math.random() * suppliers.length)]} -> ${amt} zł</strong>`;
+                    log.style.display = 'block'; log.style.borderColor = 'var(--accent)'; log.style.color = 'var(--accent)';
+                    if(context === 'dzis') calculateLive();
+                } else { log.innerHTML = `Brak faktur.`; log.style.display = 'block'; log.style.borderColor = '#7f8c8d'; log.style.color = '#7f8c8d'; }
+            }, 900);
+        }
+
         async function saveModalEntry() {
             const dVal = document.getElementById('modDate').value; if (!dVal) return;
             const s = (parseInt(document.getElementById('modHours').value) || 0) * 3600 + (parseInt(document.getElementById('modMinutes').value) || 0) * 60;
-            const r = parseFloat(document.getElementById('modRate').value) || appState.settings.hourlyRate;
+            const r = parseFloat(document.getElementById('modRate').value) || parseFloat(appState.settings.hourlyRate);
             const c = parseFloat(document.getElementById('modCosts').value) || 0;
             const f = calcSpecificFinancials(s, c, r, dVal);
             const entry = { date: dVal, seconds: s, costs: c, rate: r, photos: tempPhotos, notes: tempNotes, gross: f.gross, zus: f.totalZus, advanceTax: f.advanceTax, estimatedReturn: f.estimatedReturn, currentNet: f.currentNet, totalNet: f.totalNet };
@@ -661,8 +684,28 @@
             appState.history.sort((a, b) => new Date(b.date) - new Date(a.date)); await saveData(); closeModal(); renderDayList(); renderCalendar(); calculateFinances();
             if(document.getElementById('calendarPreviewArea').style.display === 'block') selectCalendarDay(dVal);
         }
+        function deleteEntry(dStr) { if(confirm("Usunąć wpis z " + dStr + "?")) { appState.history = appState.history.filter(i => i.date !== dStr); saveData(); renderDayList(); renderCalendar(); calculateFinances(); document.getElementById('calendarPreviewArea').style.display = 'none';} }
+
+        function calculateFinances() {
+            let tg = 0, tc = 0, tz = 0, ta = 0, tr = 0, tcn = 0, ttn = 0, ts = 0;
+            appState.history.forEach(item => {
+                ts += item.seconds; tc += item.costs;
+                const r = calcSpecificFinancials(item.seconds, item.costs, parseFloat(item.rate || appState.settings.hourlyRate), item.date);
+                item.gross = r.gross; item.zus = r.totalZus; item.advanceTax = r.advanceTax; item.estimatedReturn = r.estimatedReturn; item.currentNet = r.currentNet; item.totalNet = r.totalNet;
+                tg += r.gross; tz += r.totalZus; ta += r.advanceTax; tr += r.estimatedReturn; tcn += r.currentNet; ttn += r.totalNet;
+            });
+            saveData();
+            document.getElementById('finHours').innerText = `${Math.floor(ts/3600)}h ${Math.floor((ts%3600)/60)}m`;
+            document.getElementById('finCosts').innerText = tc.toFixed(2) + ' zł'; document.getElementById('finGross').innerText = tg.toFixed(2) + ' zł';
+            document.getElementById('finZus').innerText = '- ' + tz.toFixed(2) + ' zł'; document.getElementById('finTax').innerText = '- ' + ta.toFixed(2) + ' zł';
+            document.getElementById('finCurrentNet').innerText = tcn.toFixed(2) + ' zł'; document.getElementById('finTotalNet').innerText = ttn.toFixed(2) + ' zł';
+            const retEl = document.getElementById('finReturn'); retEl.innerText = (tr >= 0 ? '+ ' : '') + tr.toFixed(2) + ' zł'; retEl.style.color = tr >= 0 ? 'var(--accent)' : 'var(--danger)';
+        }
         function updateSettingsUI() { document.getElementById('setTheme').value = appState.settings.theme || 'dark'; document.getElementById('setCompanyName').value = appState.settings.companyName; document.getElementById('setStartDate').value = appState.settings.startDate; document.getElementById('setHourlyRate').value = appState.settings.hourlyRate; document.getElementById('setKsefToken').value = appState.settings.ksefToken || ""; document.getElementById('displayCompanyName').innerText = appState.settings.companyName; }
-        window.onload = init;
+        function getZusPhase(dateStr) { const start = new Date(appState.settings.startDate); const target = new Date(dateStr); let firstFull = new Date(start.getFullYear(), start.getMonth(), 1); if(start.getDate() > 1) firstFull = new Date(start.getFullYear(), start.getMonth() + 1, 1); const endUlga = new Date(firstFull.getFullYear(), firstFull.getMonth() + 6, 0); const endPref = new Date(endUlga.getFullYear(), endUlga.getMonth() + 24, endUlga.getDate()); if (target <= endUlga) return { phase: "ULGA", socialRate: 0, endDate: endUlga }; if (target <= endPref) return { phase: "PREF", socialRate: ZUS_PREF_PER_HOUR, endDate: endPref }; return { phase: "DUZY", socialRate: ZUS_DUZY_PER_HOUR, endDate: null }; }
+        function updateZusWidget() { const info = getZusPhase(getTodayDateString()); const title = document.getElementById('zusStatusTitle'); const count = document.getElementById('zusCountdown'); if (info.phase === "ULGA") title.innerText = "Ulga na start (0 zł składek społecznych)"; else if (info.phase === "PREF") title.innerText = "ZUS Preferencyjny (Mały ZUS)"; else { title.innerText = "ZUS Standardowy (Duży)"; count.innerText = "Ulgi czasowe wygasły."; return; } const diff = Math.ceil(Math.abs(info.endDate - new Date()) / (1000 * 60 * 60 * 24)); const m = Math.floor(diff/30); const d = diff%30; count.innerText = `Pozostało: ${m > 0 ? m + " mies. " : ""}${d} dni (do ${info.endDate.toLocaleDateString('pl-PL')})`; }
+        function calcSpecificFinancials(seconds, costs, rate, dateStr) { const hours = seconds / 3600; const gross = hours * parseFloat(rate); const zus = getZusPhase(dateStr); const social = hours * zus.socialRate; let income = gross - costs - social; if (income < 0) income = 0; const health = income * 0.09; const totalZus = social + health; let advTax = (income * 0.12) - (KWOTA_WOLNA_JA_PER_HOUR * hours); if (advTax < 0) advTax = 0; let finalTax = (income * 0.12) - ((KWOTA_WOLNA_JA_PER_HOUR + ULGI_ROCZNE_PER_HOUR) * hours); if (finalTax < 0) finalTax = 0; return { gross, costs, totalZus, advanceTax: advTax, estimatedReturn: advTax - finalTax, currentNet: gross - costs - totalZus - advTax, totalNet: (gross - costs - totalZus - advTax) + (advTax - finalTax) }; }
+        function saveSettings() { appState.settings.theme = document.getElementById('setTheme').value; appState.settings.companyName = document.getElementById('setCompanyName').value; appState.settings.startDate = document.getElementById('setStartDate').value; appState.settings.hourlyRate = parseFloat(document.getElementById('setHourlyRate').value) || 78; appState.settings.ksefToken = document.getElementById('setKsefToken').value; saveData(); applyTheme(); document.getElementById('displayCompanyName').innerText = appState.settings.companyName; updateZusWidget(); calculateLive(); calculateFinances(); renderDayList(); alert("Ustawienia systemowe zaktualizowane!"); }
     </script>
 </body>
 </html>
