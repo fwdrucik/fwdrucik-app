@@ -24,7 +24,7 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: var(--bg); color: var(--text); padding: 10px; max-width: 600px; margin: 0 auto; transition: background-color 0.3s, color 0.3s; }
         
         .nav { display: flex; justify-content: space-between; background: var(--primary); padding: 6px; border-radius: 10px; margin-bottom: 20px; overflow-x: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.15); border: 1px solid var(--border); }
-        .nav button { background: none; color: #a0aec0; border: none; padding: 10px 12px; cursor: pointer; font-size: 0.85em; border-radius: 8px; white-space: nowrap; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-weight: 600;}
+        .nav button { background: none; color: #a0aec0; border: none; padding: 10px 12px; cursor: pointer; font-size: 0.85em; border-radius: 6px; white-space: nowrap; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-weight: 600;}
         .nav button.active { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(0, 188, 255, 0.4); }
         .nav svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
         
@@ -144,7 +144,7 @@
 
             <div id="noteInputArea">
                 <label>Zapisz uwagi lub użyj <strong>mikrofonu na klawiaturze</strong>:</label>
-                <textarea id="androidNoteInput" rows="3" placeholder="Wpisz numery błędów, opis usterki, wykonane naprawy..."></textarea>
+                <textarea id="androidNoteInput" rows="3" placeholder="Wpisz numery błędów, opis usterki, wykonane naprawy przed/po..."></textarea>
                 <div style="display:flex; gap:10px; margin-top:5px;">
                     <button class="btn-action" style="flex:1; background:var(--accent);" onclick="saveAndroidNote()">Zapisz</button>
                     <button class="btn-action" style="flex:1; background:#95a5a6;" onclick="closeNoteArea()">Anuluj</button>
@@ -342,7 +342,6 @@
         const KWOTA_WOLNA_JA_PER_HOUR = 1.875; const ULGI_ROCZNE_PER_HOUR = 4.075; const ZUS_PREF_PER_HOUR = 2.50; const ZUS_DUZY_PER_HOUR = 10.00; 
         let timerInterval = null; let currentCalMonth = new Date().getMonth(); let currentCalYear = new Date().getFullYear();
 
-        // Funkcja generująca niezależną, stabilną datę tekstową dla silnika podatków
         function getTodayDateString() {
             const d = new Date();
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -497,20 +496,34 @@
             document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
         }
 
+        // ZMIANA: Usunięcie location.reload na rzecz bezpośredniego natychmiastowego renderowania zmian w locie
         function importData(event) {
             const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
             reader.onload = async function(e) {
                 try {
                     const importedState = JSON.parse(e.target.result);
                     if(importedState && importedState.settings && importedState.history) {
-                        if(confirm("Czy na pewno chcesz nadpisać bazę plikiem z kopii zapasowej?")) {
+                        if(confirm("Czy na pewno chcesz nadpisać obecną bazę danych plikiem z kopii zapasowej?")) {
                             appState = importedState;
                             await saveData(); 
-                            alert("Kopia zapasowa wgrana pomyślnie!");
-                            location.reload();
+                            
+                            // Re-render interfejsu (In-Memory) zapobiegający zamrożeniom PWA Androida
+                            applyTheme(); 
+                            updateSettingsUI(); 
+                            updateZusWidget(); 
+                            populateExportSelectors();
+                            document.getElementById('costs').value = appState.currentSession.costs || '';
+                            renderTodayDocs(); 
+                            renderDayList(); 
+                            renderCalendar(); 
+                            calculateFinances();
+                            
+                            switchTab('tab-dzis', document.querySelector('.nav button'));
+                            alert("Kopia zapasowa odzyskana i zastosowana pomyślnie!");
                         }
                     } else { alert("Niepoprawny format pliku."); }
                 } catch(x) { alert("Błąd odczytu struktury pliku."); }
+                event.target.value = '';
             }; reader.readAsText(file);
         }
 
@@ -650,26 +663,6 @@
                 if (ent) { cls += ' worked'; if(ent.photos?.length && ent.notes?.length) ind = '📸📝'; else if(ent.photos?.length) ind = '📸'; else if(ent.notes?.length) ind = '📝'; }
                 grid.innerHTML += `<div class="${cls}" onclick="selectCalendarDay('${dStr}')">${i}<div class="cal-indicator">${ind}</div></div>`;
             }
-        }
-
-        function fetchKsef(context) {
-            if (!appState.settings.ksefToken) { alert("Brak Tokenu KSeF w Ustawieniach."); return; }
-            const btn = document.getElementById(context === 'dzis' ? 'btnKsefDzis' : 'btnKsefModal');
-            const loader = document.getElementById(context === 'dzis' ? 'ksefLoaderDzis' : 'ksefLoaderModal');
-            const log = document.getElementById(context === 'dzis' ? 'ksefLogDzis' : 'ksefLogModal');
-            const input = document.getElementById(context === 'dzis' ? 'costs' : 'modCosts');
-            btn.style.display = 'none'; loader.style.display = 'block'; log.style.display = 'none';
-            setTimeout(() => {
-                loader.style.display = 'none'; btn.style.display = 'flex';
-                if (Math.random() > 0.2) {
-                    const suppliers = ["Hurtownia Części Inter-Cars", "Wurth Polska", "Spaw-Met", "Złącza Pneumatyczne"];
-                    const amt = (Math.random() * 250 + 40).toFixed(2);
-                    input.value = ((parseFloat(input.value) || 0) + parseFloat(amt)).toFixed(2);
-                    log.innerHTML = `Pobrano z KSeF:<br><strong>${suppliers[Math.floor(Math.random() * suppliers.length)]} -> ${amt} zł</strong>`;
-                    log.style.display = 'block'; log.style.borderColor = 'var(--accent)'; log.style.color = 'var(--accent)';
-                    if(context === 'dzis') calculateLive();
-                } else { log.innerHTML = `Brak faktur.`; log.style.display = 'block'; log.style.borderColor = '#7f8c8d'; log.style.color = '#7f8c8d'; }
-            }, 900);
         }
 
         async function saveModalEntry() {
